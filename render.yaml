@@ -30,8 +30,6 @@ services:
   - type: web
     name: ai-identity-guardian-app
     runtime: static
-    region: oregon
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
