@@ -1,0 +1,44 @@
+services:
+  # ====================================================================
+  # 1. Backend REST API (FastAPI)
+  # ====================================================================
+  - type: web
+    name: ai-identity-guardian-api
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DATABASE_URL
+        value: sqlite:///./ai_identity_guardian.db
+
+  # ====================================================================
+  # 2. Frontend Web Application (React + Vite SPA)
+  # ====================================================================
+  - type: web
+    name: ai-identity-guardian-app
+    runtime: static
+    region: oregon
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://ai-identity-guardian-api.onrender.com/api/v1
