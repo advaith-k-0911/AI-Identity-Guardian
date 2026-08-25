@@ -10,19 +10,19 @@ export const Card: React.FC<CardProps> = ({
   children,
   className,
   variant = "cyber",
-  glowColor = "cyan",
+  glowColor = "emerald",
   ...props
 }) => {
   const variantStyles = {
-    default: "bg-slate-900/80 border border-slate-800",
-    cyber: "cyber-glass rounded-xl shadow-xl",
+    default: "bg-white dark:bg-slate-900/80 border border-emerald-200 dark:border-slate-800 rounded-xl shadow-sm",
+    cyber: "cyber-glass rounded-xl",
     glow: {
-      cyan: "cyber-glass rounded-xl border-cyan-500/30 shadow-glow-cyan",
-      emerald: "cyber-glass rounded-xl border-emerald-500/30 shadow-glow-emerald",
-      danger: "cyber-glass rounded-xl border-rose-500/30 shadow-glow-danger",
-      amber: "cyber-glass rounded-xl border-amber-500/30 shadow-[0_0_20px_-3px_rgba(245,158,11,0.3)]",
+      cyan: "cyber-glass rounded-xl border-cyan-500/40 shadow-glow-cyan",
+      emerald: "cyber-glass rounded-xl border-emerald-500/40 shadow-glow-emerald",
+      danger: "cyber-glass rounded-xl border-rose-500/40 shadow-glow-danger",
+      amber: "cyber-glass rounded-xl border-amber-500/40 shadow-[0_0_20px_-3px_rgba(245,158,11,0.3)]",
     }[glowColor],
-    subtle: "bg-slate-900/40 border border-slate-800/60 rounded-lg",
+    subtle: "bg-emerald-50/60 dark:bg-slate-900/40 border border-emerald-200/70 dark:border-slate-800/60 rounded-lg",
   };
 
   return (
@@ -40,7 +40,7 @@ export const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
   ...props
 }) => (
-  <div className={cn("flex flex-col space-y-1.5 pb-4 border-b border-slate-800/80", className)} {...props}>
+  <div className={cn("flex flex-col space-y-1.5 pb-4 border-b border-emerald-500/15 dark:border-slate-800/80", className)} {...props}>
     {children}
   </div>
 );
@@ -50,7 +50,7 @@ export const CardTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
   className,
   ...props
 }) => (
-  <h3 className={cn("text-lg font-semibold text-slate-100 tracking-tight", className)} {...props}>
+  <h3 className={cn("text-lg font-semibold text-slate-900 dark:text-slate-100 tracking-tight", className)} {...props}>
     {children}
   </h3>
 );
@@ -60,7 +60,7 @@ export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement
   className,
   ...props
 }) => (
-  <p className={cn("text-sm text-slate-400 leading-relaxed", className)} {...props}>
+  <p className={cn("text-sm text-slate-600 dark:text-slate-400 leading-relaxed", className)} {...props}>
     {children}
   </p>
 );

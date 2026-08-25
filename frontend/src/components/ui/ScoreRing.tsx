@@ -37,7 +37,7 @@ export const ScoreRing: React.FC<ScoreRingProps> = ({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#1e293b"
+          className="stroke-slate-200 dark:stroke-slate-800"
           strokeWidth={strokeWidth}
           fill="transparent"
         />
@@ -57,10 +57,10 @@ export const ScoreRing: React.FC<ScoreRingProps> = ({
       </svg>
       {/* Center content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-        <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-slate-100">
+        <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-slate-900 dark:text-slate-100">
           {clampedScore}
         </span>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-400 mt-0.5">
           {sublabel || label}
         </span>
         <span className={`text-xs font-semibold mt-1 px-2 py-0.5 rounded-full ${colorInfo.badge}`}>
