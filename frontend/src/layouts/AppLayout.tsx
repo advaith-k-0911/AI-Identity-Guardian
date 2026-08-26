@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Shield, Scan, LayoutDashboard, FileText, Menu, X, Lock, User, LogOut, LogIn, Sun, Moon } from "lucide-react";
+import { Shield, Scan, LayoutDashboard, FileText, Menu, X, Lock, User, LogOut, LogIn, Sun, Moon, Users } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { api } from "../services/api";
+import { AboutDevModal } from "../components/ui/AboutDevModal";
 
 export interface AppLayoutProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ export interface AppLayoutProps {
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [aboutDevOpen, setAboutDevOpen] = useState(false);
   const [backendHealthy, setBackendHealthy] = useState<boolean | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -82,6 +84,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   </Link>
                 );
               })}
+              <button
+                onClick={() => setAboutDevOpen(true)}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900"
+              >
+                <Users className="w-4 h-4" />
+                <span>About Dev</span>
+              </button>
             </nav>
 
             {/* Right Action Section */}
@@ -170,62 +179,70 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black px-4 pt-2 pb-4 space-y-2">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              const active = isActive(link.path);
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium ${
-                    active
-                      ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/30 font-semibold"
-                      : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900"
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
-
-            <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
-              {isAuthenticated ? (
+        </div>            {/* Mobile Navigation Drawer */}
+            {mobileMenuOpen && (
+              <div className="md:hidden border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black px-4 pt-2 pb-4 space-y-2">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  const active = isActive(link.path);
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium ${
+                        active
+                          ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/30 font-semibold"
+                          : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span>{link.label}</span>
+                    </Link>
+                  );
+                })}
                 <button
-                  onClick={() => {
-                    handleLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-red-500 font-mono text-xs"
+                  onClick={() => { setAboutDevOpen(true); setMobileMenuOpen(false); }}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 w-full"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span>Sign Out ({user?.email})</span>
+                  <Users className="w-5 h-5" />
+                  <span>About Dev</span>
                 </button>
-              ) : (
-                <Link
-                  to="/auth"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-green-600 dark:text-green-400 font-mono text-xs font-semibold"
-                >
-                  <LogIn className="w-4 h-4" />
-                  <span>Sign In / Create Account</span>
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
+
+                <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                  {isAuthenticated ? (
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-red-500 font-mono text-xs"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out ({user?.email})</span>
+                    </button>
+                  ) : (
+                    <Link
+                      to="/auth"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-green-600 dark:text-green-400 font-mono text-xs font-semibold"
+                    >
+                      <LogIn className="w-4 h-4" />
+                      <span>Sign In / Create Account</span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
       </header>
 
       {/* Main Content Viewport */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
+
+      {/* About Dev Modal */}
+      <AboutDevModal isOpen={aboutDevOpen} onClose={() => setAboutDevOpen(false)} />
 
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black mt-auto py-8 transition-colors">
