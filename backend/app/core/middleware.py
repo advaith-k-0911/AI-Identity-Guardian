@@ -17,6 +17,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Enforces essential defensive HTTP security headers across all API responses."""
 
     async def dispatch(self, request: Request, call_next):
+        # Let CORS preflight OPTIONS requests pass through untouched
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         response: Response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
@@ -39,10 +43,14 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
         self.auth_clients: Dict[str, List[float]] = defaultdict(list)
 
     async def dispatch(self, request: Request, call_next):
+        # Skip OPTIONS preflight requests
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         path = request.url.path
         
         # Allow health checks and OpenAPI docs without throttling
-        if path in ["/health", "/docs", "/openapi.json", "/redoc"]:
+        if path in ["/health", "/docs", "/openapi.json", "/redoc", "/api/v1/health"]:
             return await call_next(request)
         
         # Skip rate limiting in test environment
@@ -58,7 +66,7 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
             auth_timestamps = [t for t in self.auth_clients[client_ip] if t > window_start]
             self.auth_clients[client_ip] = auth_timestamps
             
-            if len(auth_timestamps) >= 100:  # 100 auth attempts per minute per IP
+            if len(auth_timestamps) >= 100:
                 return JSONResponse(
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                     content={

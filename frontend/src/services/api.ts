@@ -8,9 +8,6 @@ import {
   UsernameAnalysisResult,
   PrivacyAnalysisRequest,
   PrivacyAnalysisResult,
-  PrivacyFieldInput,
-  IdentityAnalysisRequest,
-  IdentityAnalysisResult,
   ReportCreateRequest,
   ReportSummaryResponse,
   ReportDetailResponse,
@@ -77,10 +74,11 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const baseUrl = getApiBaseUrl();
-    const url = endpoint.startsWith("http") ? endpoint : `${baseUrl}${endpoint}`;
+    const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    const url = endpoint.startsWith("http") ? endpoint : `${baseUrl}${cleanEndpoint}`;
     
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
       ...(options.headers as Record<string, string>),
     };
 
@@ -104,7 +102,7 @@ class ApiClient {
 
       return data.data as T;
     } catch (error: any) {
-      console.error(`API Error [${endpoint}]:`, error);
+      console.error(`API Error [${url}]:`, error);
       throw error;
     }
   }
@@ -118,19 +116,19 @@ class ApiClient {
 
   // --- Authentication Endpoints ---
 
-  async register(payload: UserRegisterRequest): Promise<TokenResponse> {
+  async register(data: UserRegisterRequest): Promise<TokenResponse> {
     const res = await this.request<TokenResponse>("/auth/register", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
     this.setToken(res.access_token);
     return res;
   }
 
-  async login(payload: UserLoginRequest): Promise<TokenResponse> {
+  async login(data: UserLoginRequest): Promise<TokenResponse> {
     const res = await this.request<TokenResponse>("/auth/login", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
     this.setToken(res.access_token);
     return res;
@@ -138,87 +136,82 @@ class ApiClient {
 
   async logout(): Promise<void> {
     try {
-      await this.request<void>("/auth/logout", { method: "POST" });
+      await this.request("/auth/logout", { method: "POST" });
     } finally {
       this.setToken(null);
     }
   }
 
-  async getMe(): Promise<UserResponse> {
-    return this.request<UserResponse>("/auth/me", { method: "GET" });
+  async getCurrentUser(): Promise<UserResponse> {
+    return this.request<UserResponse>("/auth/me");
   }
 
-  // --- Risk Analysis Endpoints ---
+  async getMe(): Promise<UserResponse> {
+    return this.getCurrentUser();
+  }
 
-  async analyzeUsername(payload: UsernameAnalysisRequest): Promise<UsernameAnalysisResult> {
+  // --- Security Risk Analysis Engines ---
+
+  async analyzeUsername(data: UsernameAnalysisRequest): Promise<UsernameAnalysisResult> {
     return this.request<UsernameAnalysisResult>("/analysis/username", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
   }
 
-  async analyzePrivacy(payload: PrivacyAnalysisRequest): Promise<PrivacyAnalysisResult> {
+  async analyzePrivacy(data: PrivacyAnalysisRequest): Promise<PrivacyAnalysisResult> {
     return this.request<PrivacyAnalysisResult>("/analysis/privacy", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
   }
 
-  async getPrivacyDefaults(): Promise<PrivacyFieldInput[]> {
-    return this.request<PrivacyFieldInput[]>("/analysis/privacy/defaults", {
-      method: "GET",
-    });
-  }
-
-  async analyzeImpersonation(payload: ImpersonationAnalysisRequest): Promise<ImpersonationAnalysisResult> {
+  async analyzeImpersonation(data: ImpersonationAnalysisRequest): Promise<ImpersonationAnalysisResult> {
     return this.request<ImpersonationAnalysisResult>("/analysis/impersonation", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
   }
 
-  async analyzeCredentials(payload: CredentialAnalysisRequest): Promise<CredentialAnalysisResult> {
+  async analyzeCredentials(data: CredentialAnalysisRequest): Promise<CredentialAnalysisResult> {
     return this.request<CredentialAnalysisResult>("/analysis/credentials", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
   }
 
-  async analyzeRecovery(payload: RecoveryAnalysisRequest): Promise<RecoveryAnalysisResult> {
+  async analyzeRecovery(data: RecoveryAnalysisRequest): Promise<RecoveryAnalysisResult> {
     return this.request<RecoveryAnalysisResult>("/analysis/recovery", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
   }
 
-  async analyzeDiess(payload: ComprehensiveIdentityScanRequest): Promise<DiessCalculationResult> {
+  async analyzeDiess(data: ComprehensiveIdentityScanRequest): Promise<DiessCalculationResult> {
     return this.request<DiessCalculationResult>("/analysis/diess", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
   }
 
-  async explainFindings(payload: AIExplanationRequest): Promise<AIExplanationResponse> {
+  async explainFindings(data: AIExplanationRequest): Promise<AIExplanationResponse> {
     return this.request<AIExplanationResponse>("/ai/explain", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
   }
 
-  async analyzeIdentity(payload: IdentityAnalysisRequest): Promise<IdentityAnalysisResult> {
-    return this.request<IdentityAnalysisResult>("/analysis/identity", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-  }
+  // --- Reports Persistence & History ---
 
-  // --- Reports Endpoints ---
-
-  async createReport(payload: ReportCreateRequest): Promise<ReportDetailResponse> {
+  async saveReport(data: ReportCreateRequest): Promise<ReportDetailResponse> {
     return this.request<ReportDetailResponse>("/reports", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data),
     });
+  }
+
+  async createReport(data: ReportCreateRequest): Promise<ReportDetailResponse> {
+    return this.saveReport(data);
   }
 
   async getReport(reportId: string): Promise<ReportDetailResponse> {
