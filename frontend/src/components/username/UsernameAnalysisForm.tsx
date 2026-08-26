@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Fingerprint, User, Calendar, ShieldCheck, Zap, Sparkles } from "lucide-react";
+import { Fingerprint, User, Calendar, ShieldCheck, Zap } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { UsernameAnalysisRequest } from "../../types";
@@ -21,18 +21,15 @@ export const UsernameAnalysisForm: React.FC<UsernameAnalysisFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim()) {
-      setError("Please enter a username handle to analyze.");
+      setError("Please enter a username to analyze.");
       return;
     }
     setError(null);
-
-    const payload: UsernameAnalysisRequest = {
+    onSubmit({
       username: username.trim(),
       full_name: fullName.trim() || undefined,
       birth_year: birthYear.trim() ? parseInt(birthYear.trim(), 10) : undefined,
-    };
-
-    onSubmit(payload);
+    });
   };
 
   const applyPreset = (presetUser: string, presetName: string, presetYear: string) => {
@@ -46,86 +43,78 @@ export const UsernameAnalysisForm: React.FC<UsernameAnalysisFormProps> = ({
     <Card variant="cyber" className="max-w-2xl mx-auto">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <div className="w-10 h-10 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-600 dark:text-green-400">
             <Fingerprint className="w-5 h-5" />
           </div>
           <div>
             <CardTitle className="text-xl font-sans">Username Security Scanner</CardTitle>
             <CardDescription>
-              Evaluate how much personal data your handle exposes to correlation and OSINT.
+              Evaluate how much personal data your handle exposes.
             </CardDescription>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-6 pt-4">
-        {/* Quick Test Presets */}
+        {/* Quick Presets */}
         <div className="space-y-2">
-          <label className="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+          <label className="text-xs font-mono uppercase tracking-wider text-zinc-500">
             Quick Test Presets
           </label>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => applyPreset("nexus_sentinel_x", "Alice Smith", "1994")}
-              className="text-xs font-mono px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-500/5 text-emerald-300 transition-colors"
+              className="text-xs font-mono px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-green-500/50 hover:bg-green-500/5 text-green-600 dark:text-green-300 transition-colors"
             >
-              ✓ Clean Pseudonym
+              Clean Pseudonym
             </button>
             <button
               type="button"
               onClick={() => applyPreset("alice_smith_1994", "Alice Smith", "1994")}
-              className="text-xs font-mono px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-rose-500/50 hover:bg-rose-500/5 text-rose-300 transition-colors"
+              className="text-xs font-mono px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-red-500/50 hover:bg-red-500/5 text-red-500 dark:text-red-300 transition-colors"
             >
-              ⚠ Name + Birth Year Leak
+              Name + Birth Year Leak
             </button>
             <button
               type="button"
               onClick={() => applyPreset("player12345", "", "")}
-              className="text-xs font-mono px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-amber-500/50 hover:bg-amber-500/5 text-amber-300 transition-colors"
+              className="text-xs font-mono px-2.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-amber-500/50 hover:bg-amber-500/5 text-amber-500 dark:text-amber-300 transition-colors"
             >
-              ⚠ Sequential Pattern
+              Sequential Pattern
             </button>
           </div>
         </div>
 
-        {/* Input Form */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Username Field */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-mono uppercase tracking-wider text-slate-300">
-              Target Username <span className="text-cyan-400">*</span>
+            <label className="block text-xs font-mono uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+              Target Username <span className="text-green-500">*</span>
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
                 <Fingerprint className="w-4 h-4" />
               </div>
               <input
                 type="text"
                 value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                  if (error) setError(null);
-                }}
+                onChange={(e) => { setUsername(e.target.value); if (error) setError(null); }}
                 placeholder="e.g. shadow_ghost_99"
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 font-mono text-sm transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-green-500 font-mono text-sm transition-all"
                 disabled={isLoading}
               />
             </div>
-            {error && (
-              <p className="text-xs text-rose-400 font-mono">{error}</p>
-            )}
+            {error && <p className="text-xs text-red-500 font-mono">{error}</p>}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Legal / Real Name (Optional) */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-300">
-                Your Real Name <span className="text-slate-500">(Optional)</span>
+              <label className="block text-xs font-mono uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                Your Real Name <span className="text-zinc-400">(Optional)</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -133,20 +122,19 @@ export const UsernameAnalysisForm: React.FC<UsernameAnalysisFormProps> = ({
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Alice Smith"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 font-mono text-sm transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-green-500 font-mono text-sm transition-all"
                   disabled={isLoading}
                 />
               </div>
-              <p className="text-[11px] text-slate-500">Checks for name leaks inside the username.</p>
+              <p className="text-[11px] text-zinc-400">Checks for name leaks.</p>
             </div>
 
-            {/* Birth Year (Optional) */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-slate-300">
-                Birth Year <span className="text-slate-500">(Optional)</span>
+              <label className="block text-xs font-mono uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                Birth Year <span className="text-zinc-400">(Optional)</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
                   <Calendar className="w-4 h-4" />
                 </div>
                 <input
@@ -156,30 +144,24 @@ export const UsernameAnalysisForm: React.FC<UsernameAnalysisFormProps> = ({
                   value={birthYear}
                   onChange={(e) => setBirthYear(e.target.value)}
                   placeholder="e.g. 1994"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 font-mono text-sm transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-green-500 font-mono text-sm transition-all"
                   disabled={isLoading}
                 />
               </div>
-              <p className="text-[11px] text-slate-500">Checks for DOB hints and year patterns.</p>
+              <p className="text-[11px] text-zinc-400">Checks for DOB hints.</p>
             </div>
           </div>
 
           <div className="pt-2">
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full font-mono text-sm"
-              isLoading={isLoading}
-              leftIcon={<Zap className="w-4 h-4" />}
-            >
-              Analyze Username Security
+            <Button type="submit" size="lg" className="w-full font-mono text-sm" isLoading={isLoading} leftIcon={<Zap className="w-4 h-4" />}>
+              Analyze Username
             </Button>
           </div>
         </form>
 
-        <div className="pt-3 border-t border-slate-800/80 flex items-center gap-2 text-xs text-slate-500 font-mono">
-          <ShieldCheck className="w-4 h-4 text-cyan-500 flex-shrink-0" />
-          <span>Transient processing: Your inputs are never saved or transmitted to third parties.</span>
+        <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center gap-2 text-xs text-zinc-500">
+          <ShieldCheck className="w-4 h-4 text-green-500 flex-shrink-0" />
+          <span>Transient processing: Your inputs are never saved or shared.</span>
         </div>
       </CardContent>
     </Card>

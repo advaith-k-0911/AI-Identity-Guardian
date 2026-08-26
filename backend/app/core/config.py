@@ -1,8 +1,18 @@
 """Application configuration using Pydantic Settings."""
 
+import os
+import secrets
+import logging
 from typing import List, Union, Optional
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger("app.config")
+
+
+def _generate_default_secret() -> str:
+    """Generate a cryptographically secure random secret key."""
+    return secrets.token_hex(32)
 
 
 class Settings(BaseSettings):
@@ -18,9 +28,23 @@ class Settings(BaseSettings):
     PORT: int = 8000
 
     # Security & JWT
-    SECRET_KEY: str = "ai-identity-guardian-super-secure-jwt-secret-key-change-in-prod-2026"
+    SECRET_KEY: str = ""
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+
+    def model_post_init(self, __context) -> None:
+        """Validate that SECRET_KEY is properly set in production."""
+        if not self.SECRET_KEY or self.SECRET_KEY == "":
+            # Generate a random key for development
+            object.__setattr__(self, 'SECRET_KEY', _generate_default_secret())
+            if self.ENVIRONMENT == "production":
+                logger.critical(
+                    "SECURITY: SECRET_KEY was not set in the environment. "
+                    "A random key has been generated for this process. "
+                    "Set SECRET_KEY in your .env or environment variables for production!"
+                )
+            else:
+                logger.warning("SECRET_KEY not set; auto-generated for development.")
 
     # DIESS Canonical Weights (Total = 1.00)
     DIESS_WEIGHT_USERNAME: float = 0.20

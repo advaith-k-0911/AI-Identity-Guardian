@@ -18,7 +18,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: CORS_ORIGINS
-        value: "*"
+        value: "https://ai-identity-guardian-app.onrender.com"
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: DATABASE_URL

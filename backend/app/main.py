@@ -25,7 +25,7 @@ app = FastAPI(
 
 # Attach Security Headers & Rate Limiting Middleware
 app.add_middleware(SecurityHeadersMiddleware)
-app.add_middleware(RateLimitingMiddleware, max_requests=250, window_seconds=60)
+app.add_middleware(RateLimitingMiddleware, max_requests=60, window_seconds=60)
 
 # CORS Middleware setup
 if settings.CORS_ORIGINS:

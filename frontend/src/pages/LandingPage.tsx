@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Shield, Fingerprint, EyeOff, Lock, ArrowRight, CheckCircle2, Zap, ShieldCheck } from "lucide-react";
+import { Shield, Fingerprint, EyeOff, Lock, ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/Card";
 import { ScoreRing } from "../components/ui/ScoreRing";
@@ -11,35 +11,31 @@ export const LandingPage: React.FC = () => {
     {
       icon: Fingerprint,
       title: "Username Threat Analysis",
-      description: "Detects real names, birth years, sequential patterns, and compounding multi-attribute leaks embedded within your public handles.",
-      color: "emerald",
+      description: "Detects real names, birth years, sequential patterns, and multi-attribute leaks in your public handles.",
       badge: "ACTIVE",
     },
     {
       icon: EyeOff,
       title: "Privacy Exposure Engine",
-      description: "Evaluates public profile attributes against sensitivity ratings, necessity, and oversharing risks to identify attack vectors.",
-      color: "emerald",
+      description: "Evaluates public profile attributes against sensitivity ratings and oversharing risks to identify attack vectors.",
       badge: "ACTIVE",
     },
     {
       icon: Shield,
       title: "Composite DIESS Metric",
-      description: "Calculates the Digital Identity Exposure & Security Score—a unified 0–100 benchmark representing your overall attack surface.",
-      color: "emerald",
+      description: "Calculates a unified 0-100 security score representing your overall digital identity attack surface.",
       badge: "DETERMINISTIC",
     },
     {
       icon: Lock,
       title: "Zero-Knowledge Architecture",
-      description: "Built with defense-in-depth principles. Inputs are analyzed transiently in memory with zero plaintext retention or telemetry.",
-      color: "emerald",
+      description: "Inputs are analyzed transiently in memory with zero plaintext retention or telemetry.",
       badge: "PRIVACY-FIRST",
     },
   ];
 
   const features = [
-    "Deterministic, explainable security scoring (0–100)",
+    "Deterministic, explainable security scoring (0-100)",
     "Granular severity grading (LOW, MEDIUM, HIGH, CRITICAL)",
     "Actionable remediation recommendations per finding",
     "No passwords or sensitive identifiers permanently stored",
@@ -49,24 +45,24 @@ export const LandingPage: React.FC = () => {
   return (
     <div className="space-y-16 py-4">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-6 pb-12">
+      <section className="relative pt-6 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono text-emerald-700 dark:text-emerald-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              NEXT-GEN IDENTITY RISK EVALUATION
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/30 text-xs font-mono text-green-600 dark:text-green-400">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              IDENTITY RISK EVALUATION
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 leading-[1.15] font-sans">
-              Is Your Digital Identity <br />
-              <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 dark:from-emerald-400 dark:via-teal-300 dark:to-cyan-400 bg-clip-text text-transparent">
-                Exposing You Online?
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-black dark:text-white leading-[1.15] font-sans">
+              Is Your Digital Identity{" "}
+              <span className="text-green-500 dark:text-green-400">
+                Exposing You?
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl leading-relaxed">
-              AI Identity Guardian calculates your <strong>Digital Identity Exposure & Security Score (DIESS)</strong>. 
-              Discover how much personal data your usernames, profile visibility, and digital footprints reveal to adversaries.
+            <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed">
+              AI Identity Guardian calculates your <strong>Digital Identity Exposure & Security Score (DIESS)</strong>.
+              Discover how much personal data your usernames, profile visibility, and digital footprints reveal.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -77,52 +73,51 @@ export const LandingPage: React.FC = () => {
               </Link>
               <Link to="/dashboard">
                 <Button variant="secondary" size="lg">
-                  Explore Posture Dashboard
+                  View Dashboard
                 </Button>
               </Link>
             </div>
 
             {/* Quick Guarantees */}
-            <div className="pt-4 flex flex-wrap items-center gap-6 text-xs text-slate-600 dark:text-slate-400 font-mono">
+            <div className="pt-4 flex flex-wrap items-center gap-6 text-xs text-zinc-600 dark:text-zinc-400">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-                <span>Zero Account Required</span>
+                <CheckCircle2 className="w-4 h-4 text-green-500 dark:text-green-400" />
+                <span>No Account Required</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-green-500 dark:text-green-400" />
                 <span>No Data Retention</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-                <span>Instant Actionable Report</span>
+                <CheckCircle2 className="w-4 h-4 text-green-500 dark:text-green-400" />
+                <span>Instant Report</span>
               </div>
             </div>
           </div>
 
-          {/* Interactive Score Preview Card */}
+          {/* Score Preview Card */}
           <div className="lg:col-span-5 flex justify-center">
-            <Card variant="glow" glowColor="emerald" className="w-full max-w-md relative overflow-hidden">
-              <div className="absolute top-0 right-0 transform translate-x-4 -translate-y-4 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+            <Card variant="glow" glowColor="emerald" className="w-full max-w-md">
               <CardHeader className="text-center pb-2">
                 <div className="flex items-center justify-between">
                   <Badge severity="MEDIUM">DIESS PREVIEW</Badge>
-                  <span className="text-xs font-mono text-slate-500 dark:text-slate-400">SAMPLE AUDIT</span>
+                  <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">SAMPLE AUDIT</span>
                 </div>
-                <CardTitle className="text-xl mt-2 font-mono">Identity Posture Gauge</CardTitle>
-                <CardDescription>Composite multi-vector score synthesis</CardDescription>
+                <CardTitle className="text-xl mt-2 font-mono">Identity Posture</CardTitle>
+                <CardDescription>Multi-vector score synthesis</CardDescription>
               </CardHeader>
 
               <CardContent className="flex flex-col items-center space-y-6 pt-4">
                 <ScoreRing score={78} size={200} strokeWidth={16} label="DIESS" />
 
                 <div className="w-full space-y-2 text-xs font-mono">
-                  <div className="flex justify-between items-center p-2 rounded bg-emerald-50/80 dark:bg-slate-950/60 border border-emerald-200/80 dark:border-slate-800">
-                    <span className="text-slate-600 dark:text-slate-400">Username Security:</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">85 / 100</span>
+                  <div className="flex justify-between items-center p-2 rounded bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                    <span className="text-zinc-600 dark:text-zinc-400">Username Security:</span>
+                    <span className="text-green-600 dark:text-green-400 font-semibold">85 / 100</span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded bg-emerald-50/80 dark:bg-slate-950/60 border border-emerald-200/80 dark:border-slate-800">
-                    <span className="text-slate-600 dark:text-slate-400">Privacy Exposure:</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">72 / 100</span>
+                  <div className="flex justify-between items-center p-2 rounded bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                    <span className="text-zinc-600 dark:text-zinc-400">Privacy Exposure:</span>
+                    <span className="text-green-600 dark:text-green-400 font-semibold">72 / 100</span>
                   </div>
                 </div>
 
@@ -137,14 +132,14 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Core Architectural Pillars */}
+      {/* Core Pillars */}
       <section className="space-y-8">
         <div className="text-center space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-sans">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-black dark:text-white font-sans">
             How AI Identity Guardian Protects You
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            A deterministic, multi-dimensional risk framework engineered to identify attack surfaces before adversaries do.
+          <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
+            A deterministic risk framework engineered to identify attack surfaces before adversaries do.
           </p>
         </div>
 
@@ -152,21 +147,21 @@ export const LandingPage: React.FC = () => {
           {pillars.map((pillar, idx) => {
             const Icon = pillar.icon;
             return (
-              <Card key={idx} variant="cyber" className="hover:border-emerald-500/40 transition-all duration-300 group">
+              <Card key={idx} variant="cyber" className="hover:border-green-500/40 transition-all duration-200 group">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-600 dark:text-green-400 flex-shrink-0">
                     <Icon className="w-6 h-6" />
                   </div>
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 font-sans">
+                      <h3 className="text-lg font-semibold text-black dark:text-white font-sans">
                         {pillar.title}
                       </h3>
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-slate-800 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-slate-700">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-green-500/10 text-green-700 dark:text-green-300 border border-green-500/30">
                         {pillar.badge}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                       {pillar.description}
                     </p>
                   </div>
@@ -178,38 +173,39 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Explainable Security Findings */}
-      <section className="cyber-glass rounded-2xl p-8 sm:p-10 border border-emerald-500/20">
+      <section className="rounded-2xl p-8 sm:p-10 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-7 space-y-4">
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 font-sans">
-              Explainable & Grounded Security Findings
+            <h3 className="text-2xl font-bold text-black dark:text-white font-sans">
+              Explainable Security Findings
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Unlike black-box scoring tools that generate opaque numbers, AI Identity Guardian executes deterministic security heuristics. Every score deduction maps directly to an identifiable risk finding with transparent remediation steps.
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              Unlike black-box scoring tools, AI Identity Guardian executes deterministic security heuristics.
+              Every score deduction maps directly to an identifiable risk finding with transparent remediation steps.
             </p>
-            <ul className="space-y-2 pt-2 text-sm text-slate-700 dark:text-slate-300">
+            <ul className="space-y-2 pt-2 text-sm text-zinc-700 dark:text-zinc-300">
               {features.map((feat, i) => (
                 <li key={i} className="flex items-center gap-2.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                  <ShieldCheck className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
                   <span>{feat}</span>
                 </li>
               ))}
             </ul>
           </div>
           <div className="lg:col-span-5 flex justify-center">
-            <div className="w-full p-6 rounded-xl bg-white dark:bg-slate-950/80 border border-emerald-200 dark:border-slate-800 space-y-4 font-mono text-xs shadow-sm">
-              <div className="text-emerald-700 dark:text-emerald-400 font-semibold uppercase tracking-wider flex items-center gap-2">
-                <Zap className="w-4 h-4" /> DIESS Evaluation Model
+            <div className="w-full p-6 rounded-xl bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 space-y-4 font-mono text-xs">
+              <div className="text-green-600 dark:text-green-400 font-semibold uppercase tracking-wider">
+                DIESS Evaluation Model
               </div>
-              <div className="space-y-1.5 text-slate-600 dark:text-slate-400">
-                <p>• Username Security: 20%</p>
-                <p>• Privacy Exposure: 25%</p>
-                <p>• Impersonation Security: 20%</p>
-                <p>• Credential Security: 20%</p>
-                <p>• Recovery Security: 15%</p>
+              <div className="space-y-1.5 text-zinc-600 dark:text-zinc-400">
+                <p>Username Security: 20%</p>
+                <p>Privacy Exposure: 25%</p>
+                <p>Impersonation Security: 20%</p>
+                <p>Credential Security: 20%</p>
+                <p>Recovery Security: 15%</p>
               </div>
-              <div className="pt-2 border-t border-emerald-200 dark:border-slate-800 text-slate-500">
-                Formula: DIESS = &Sigma; (w_i &times; S_i)
+              <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 text-zinc-500">
+                Formula: DIESS = Sum(w_i * S_i)
               </div>
             </div>
           </div>

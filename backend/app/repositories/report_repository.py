@@ -159,10 +159,18 @@ class ReportRepository:
         limit: int = 50,
         offset: int = 0,
     ) -> List[ReportModel]:
-        """List historical reports ordered by creation date, optionally filtered by user."""
+        """List historical reports ordered by creation date.
+        
+        Authenticated users see only their own reports.
+        Anonymous users see only unowned reports (user_id is None).
+        """
         query = db.query(ReportModel)
         if user_id:
+            # Authenticated: only their own reports
             query = query.filter(ReportModel.user_id == user_id)
+        else:
+            # Anonymous: only unowned reports
+            query = query.filter(ReportModel.user_id.is_(None))
         return (
             query.order_by(ReportModel.created_at.desc())
             .offset(offset)

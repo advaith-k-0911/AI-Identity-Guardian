@@ -60,7 +60,6 @@ export const ScanPage: React.FC = () => {
   const [isRecoveryLoading, setIsRecoveryLoading] = useState(false);
   const [recoveryError, setRecoveryError] = useState<string | null>(null);
 
-  // Username Scan Handler
   const handleUsernameSubmit = async (data: UsernameAnalysisRequest) => {
     setIsUsernameLoading(true);
     setUsernameError(null);
@@ -68,14 +67,12 @@ export const ScanPage: React.FC = () => {
       const result = await api.analyzeUsername(data);
       setUsernameResult(result);
     } catch (err: any) {
-      console.error("Username scan failed:", err);
       setUsernameError(err.message || "Failed to analyze username security.");
     } finally {
       setIsUsernameLoading(false);
     }
   };
 
-  // Privacy Scan Handler
   const handlePrivacySubmit = async (fields: PrivacyFieldInput[]) => {
     setIsPrivacyLoading(true);
     setPrivacyError(null);
@@ -84,14 +81,12 @@ export const ScanPage: React.FC = () => {
       const result = await api.analyzePrivacy({ fields });
       setPrivacyResult(result);
     } catch (err: any) {
-      console.error("Privacy scan failed:", err);
-      setPrivacyError(err.message || "Failed to analyze privacy profile exposure.");
+      setPrivacyError(err.message || "Failed to analyze privacy exposure.");
     } finally {
       setIsPrivacyLoading(false);
     }
   };
 
-  // Impersonation Scan Handler
   const handleImpersonationSubmit = async (data: ImpersonationAnalysisRequest) => {
     setIsImpersonationLoading(true);
     setImpersonationError(null);
@@ -99,14 +94,12 @@ export const ScanPage: React.FC = () => {
       const result = await api.analyzeImpersonation(data);
       setImpersonationResult(result);
     } catch (err: any) {
-      console.error("Impersonation scan failed:", err);
       setImpersonationError(err.message || "Failed to analyze impersonation risk.");
     } finally {
       setIsImpersonationLoading(false);
     }
   };
 
-  // Credential Scan Handler
   const handleCredentialSubmit = async (data: CredentialAnalysisRequest) => {
     setIsCredentialLoading(true);
     setCredentialError(null);
@@ -114,14 +107,12 @@ export const ScanPage: React.FC = () => {
       const result = await api.analyzeCredentials(data);
       setCredentialResult(result);
     } catch (err: any) {
-      console.error("Credential scan failed:", err);
       setCredentialError(err.message || "Failed to analyze credential security.");
     } finally {
       setIsCredentialLoading(false);
     }
   };
 
-  // Recovery Scan Handler
   const handleRecoverySubmit = async (data: RecoveryAnalysisRequest) => {
     setIsRecoveryLoading(true);
     setRecoveryError(null);
@@ -129,115 +120,62 @@ export const ScanPage: React.FC = () => {
       const result = await api.analyzeRecovery(data);
       setRecoveryResult(result);
     } catch (err: any) {
-      console.error("Recovery scan failed:", err);
       setRecoveryError(err.message || "Failed to analyze recovery security.");
     } finally {
       setIsRecoveryLoading(false);
     }
   };
 
+  const tabs = [
+    { id: "username" as const, label: "Username", icon: Fingerprint },
+    { id: "privacy" as const, label: "Privacy", icon: EyeOff },
+    { id: "impersonation" as const, label: "Impersonation", icon: UserCheck },
+    { id: "credentials" as const, label: "Credentials", icon: KeyRound },
+    { id: "recovery" as const, label: "Recovery", icon: LifeBuoy },
+  ];
+
   return (
     <div className="space-y-8">
-      {/* Top Header */}
       <PageHeader
-        title="Multi-Vector Security Scanner"
-        subtitle="Evaluate username PII leaks, privacy exposure, impersonation susceptibility, credential hygiene, and recovery resilience."
-        badge={<Badge severity="LOW">ACTIVE PROTECTION</Badge>}
+        title="Security Scanner"
+        subtitle="Evaluate username PII leaks, privacy exposure, impersonation risk, credential hygiene, and recovery resilience."
+        badge={<Badge severity="LOW">ACTIVE</Badge>}
       />
 
-      {/* Module Selector Navigation Tabs */}
-      <div className="flex border-b border-slate-800 space-x-2 overflow-x-auto">
-        <button
-          onClick={() => setActiveTab("username")}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
-            activeTab === "username"
-              ? "border-cyan-400 text-cyan-300 bg-cyan-500/5 shadow-glow-cyan"
-              : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700"
-          }`}
-        >
-          <Fingerprint className="w-4 h-4" />
-          <span>Username Threat</span>
-          <Badge severity="LOW" size="sm">Phase 5</Badge>
-        </button>
-
-        <button
-          onClick={() => setActiveTab("privacy")}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
-            activeTab === "privacy"
-              ? "border-emerald-400 text-emerald-300 bg-emerald-500/5 shadow-glow-cyan"
-              : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700"
-          }`}
-        >
-          <EyeOff className="w-4 h-4" />
-          <span>Privacy Exposure</span>
-          <Badge severity="LOW" size="sm">Phase 6</Badge>
-        </button>
-
-        <button
-          onClick={() => setActiveTab("impersonation")}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
-            activeTab === "impersonation"
-              ? "border-amber-400 text-amber-300 bg-amber-500/5 shadow-glow-cyan"
-              : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700"
-          }`}
-        >
-          <UserCheck className="w-4 h-4" />
-          <span>Impersonation Risk</span>
-          <Badge severity="LOW" size="sm">Phase 9</Badge>
-        </button>
-
-        <button
-          onClick={() => setActiveTab("credentials")}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
-            activeTab === "credentials"
-              ? "border-cyan-400 text-cyan-300 bg-cyan-500/5 shadow-glow-cyan"
-              : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700"
-          }`}
-        >
-          <KeyRound className="w-4 h-4" />
-          <span>Credential Hygiene</span>
-          <Badge severity="LOW" size="sm">Phase 10</Badge>
-        </button>
-
-        <button
-          onClick={() => setActiveTab("recovery")}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
-            activeTab === "recovery"
-              ? "border-emerald-400 text-emerald-300 bg-emerald-500/5 shadow-glow-cyan"
-              : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700"
-          }`}
-        >
-          <LifeBuoy className="w-4 h-4" />
-          <span>Recovery Resiliency</span>
-          <Badge severity="LOW" size="sm">Phase 11</Badge>
-        </button>
+      {/* Module Tabs */}
+      <div className="flex border-b border-zinc-200 dark:border-zinc-800 space-x-2 overflow-x-auto">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const active = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
+                active
+                  ? "border-green-500 text-green-600 dark:text-green-400 bg-green-500/5"
+                  : "border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700"
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* 1. Username Module Tab Content */}
+      {/* Username Module */}
       {activeTab === "username" && (
-        <div className="space-y-6 animate-fadeIn">
+        <div className="space-y-6">
           {!isUsernameLoading && !usernameResult && !usernameError && (
-            <UsernameAnalysisForm
-              onSubmit={handleUsernameSubmit}
-              isLoading={isUsernameLoading}
-            />
+            <UsernameAnalysisForm onSubmit={handleUsernameSubmit} isLoading={isUsernameLoading} />
           )}
-
           {isUsernameLoading && (
-            <LoadingState
-              title="Executing Username Security Engine..."
-              message="Evaluating naming predictability, year suffix patterns, digit entropy, and compound exposures."
-            />
+            <LoadingState title="Analyzing Username Security..." message="Evaluating naming patterns, year suffixes, and compound exposures." />
           )}
-
           {usernameError && !isUsernameLoading && (
-            <ErrorState
-              title="Username Analysis Failed"
-              message={usernameError}
-              onRetry={() => setUsernameError(null)}
-            />
+            <ErrorState title="Username Analysis Failed" message={usernameError} onRetry={() => setUsernameError(null)} />
           )}
-
           {!isUsernameLoading && !usernameError && usernameResult && (
             <div className="space-y-4">
               <div className="flex justify-end">
@@ -248,9 +186,7 @@ export const ScanPage: React.FC = () => {
                     try {
                       const rep = await api.createReport({
                         report_title: `Username Audit: @${usernameResult.username}`,
-                        identity_data: {
-                          username: usernameResult.username,
-                        }
+                        identity_data: { username: usernameResult.username },
                       });
                       navigate(`/report?id=${rep.id}`);
                     } catch (e) {
@@ -259,7 +195,7 @@ export const ScanPage: React.FC = () => {
                   }}
                   leftIcon={<FileText className="w-4 h-4" />}
                 >
-                  Save as Official Report
+                  Save Report
                 </Button>
               </div>
               <UsernameResultsView
@@ -272,31 +208,18 @@ export const ScanPage: React.FC = () => {
         </div>
       )}
 
-      {/* 2. Privacy Module Tab Content */}
+      {/* Privacy Module */}
       {activeTab === "privacy" && (
-        <div className="space-y-6 animate-fadeIn">
+        <div className="space-y-6">
           {!isPrivacyLoading && !privacyResult && !privacyError && (
-            <PrivacyAnalysisForm
-              onSubmit={handlePrivacySubmit}
-              isLoading={isPrivacyLoading}
-            />
+            <PrivacyAnalysisForm onSubmit={handlePrivacySubmit} isLoading={isPrivacyLoading} />
           )}
-
           {isPrivacyLoading && (
-            <LoadingState
-              title="Evaluating Privacy Exposure Matrix..."
-              message="Evaluating attribute sensitivity, necessity checks, public data exposure, and composite surface reduction."
-            />
+            <LoadingState title="Evaluating Privacy Exposure..." message="Analyzing attribute sensitivity and public data exposure." />
           )}
-
           {privacyError && !isPrivacyLoading && (
-            <ErrorState
-              title="Privacy Exposure Analysis Failed"
-              message={privacyError}
-              onRetry={() => setPrivacyError(null)}
-            />
+            <ErrorState title="Privacy Analysis Failed" message={privacyError} onRetry={() => setPrivacyError(null)} />
           )}
-
           {!isPrivacyLoading && !privacyError && privacyResult && (
             <div className="space-y-4">
               <div className="flex justify-end">
@@ -310,7 +233,7 @@ export const ScanPage: React.FC = () => {
                         identity_data: {
                           username: "privacy_user",
                           privacy_fields: lastPrivacyPayload || undefined,
-                        }
+                        },
                       });
                       navigate(`/report?id=${rep.id}`);
                     } catch (e) {
@@ -319,7 +242,7 @@ export const ScanPage: React.FC = () => {
                   }}
                   leftIcon={<FileText className="w-4 h-4" />}
                 >
-                  Save as Official Report
+                  Save Report
                 </Button>
               </div>
               <PrivacyResultsView
@@ -332,31 +255,18 @@ export const ScanPage: React.FC = () => {
         </div>
       )}
 
-      {/* 3. Impersonation Module Tab Content */}
+      {/* Impersonation Module */}
       {activeTab === "impersonation" && (
-        <div className="space-y-6 animate-fadeIn">
+        <div className="space-y-6">
           {!isImpersonationLoading && !impersonationResult && !impersonationError && (
-            <ImpersonationAnalysisForm
-              onSubmit={handleImpersonationSubmit}
-              isLoading={isImpersonationLoading}
-            />
+            <ImpersonationAnalysisForm onSubmit={handleImpersonationSubmit} isLoading={isImpersonationLoading} />
           )}
-
           {isImpersonationLoading && (
-            <LoadingState
-              title="Analyzing Impersonation Attack Surface..."
-              message="Evaluating homoglyphs, separator duplication, authority role targeting, and generating defensive lookalike vectors."
-            />
+            <LoadingState title="Analyzing Impersonation Risk..." message="Evaluating homoglyphs, authority targeting, and lookalike vectors." />
           )}
-
           {impersonationError && !isImpersonationLoading && (
-            <ErrorState
-              title="Impersonation Analysis Failed"
-              message={impersonationError}
-              onRetry={() => setImpersonationError(null)}
-            />
+            <ErrorState title="Impersonation Analysis Failed" message={impersonationError} onRetry={() => setImpersonationError(null)} />
           )}
-
           {!isImpersonationLoading && !impersonationError && impersonationResult && (
             <div className="space-y-4">
               <div className="flex justify-end">
@@ -367,9 +277,7 @@ export const ScanPage: React.FC = () => {
                     try {
                       const rep = await api.createReport({
                         report_title: `Impersonation Audit: @${impersonationResult.username}`,
-                        identity_data: {
-                          username: impersonationResult.username,
-                        }
+                        identity_data: { username: impersonationResult.username },
                       });
                       navigate(`/report?id=${rep.id}`);
                     } catch (e) {
@@ -378,7 +286,7 @@ export const ScanPage: React.FC = () => {
                   }}
                   leftIcon={<FileText className="w-4 h-4" />}
                 >
-                  Save as Official Report
+                  Save Report
                 </Button>
               </div>
               <ImpersonationResultsView
@@ -391,31 +299,18 @@ export const ScanPage: React.FC = () => {
         </div>
       )}
 
-      {/* 4. Credential Security Module Tab Content */}
+      {/* Credentials Module */}
       {activeTab === "credentials" && (
-        <div className="space-y-6 animate-fadeIn">
+        <div className="space-y-6">
           {!isCredentialLoading && !credentialResult && !credentialError && (
-            <CredentialAnalysisForm
-              onSubmit={handleCredentialSubmit}
-              isLoading={isCredentialLoading}
-            />
+            <CredentialAnalysisForm onSubmit={handleCredentialSubmit} isLoading={isCredentialLoading} />
           )}
-
           {isCredentialLoading && (
-            <LoadingState
-              title="Auditing Credential Architecture & Hygiene..."
-              message="Evaluating multi-factor authentication strength, password manager adoption, and credential reuse vulnerability."
-            />
+            <LoadingState title="Auditing Credential Security..." message="Evaluating MFA strength, password management, and reuse risk." />
           )}
-
           {credentialError && !isCredentialLoading && (
-            <ErrorState
-              title="Credential Security Audit Failed"
-              message={credentialError}
-              onRetry={() => setCredentialError(null)}
-            />
+            <ErrorState title="Credential Audit Failed" message={credentialError} onRetry={() => setCredentialError(null)} />
           )}
-
           {!isCredentialLoading && !credentialError && credentialResult && (
             <div className="space-y-4">
               <div className="flex justify-end">
@@ -425,10 +320,8 @@ export const ScanPage: React.FC = () => {
                   onClick={async () => {
                     try {
                       const rep = await api.createReport({
-                        report_title: "Credential Security & Auth Audit",
-                        identity_data: {
-                          username: "credential_audit",
-                        }
+                        report_title: "Credential Security Audit",
+                        identity_data: { username: "credential_audit" },
                       });
                       navigate(`/report?id=${rep.id}`);
                     } catch (e) {
@@ -437,7 +330,7 @@ export const ScanPage: React.FC = () => {
                   }}
                   leftIcon={<FileText className="w-4 h-4" />}
                 >
-                  Save as Official Report
+                  Save Report
                 </Button>
               </div>
               <CredentialResultsView
@@ -450,31 +343,18 @@ export const ScanPage: React.FC = () => {
         </div>
       )}
 
-      {/* 5. Account Recovery Module Tab Content */}
+      {/* Recovery Module */}
       {activeTab === "recovery" && (
-        <div className="space-y-6 animate-fadeIn">
+        <div className="space-y-6">
           {!isRecoveryLoading && !recoveryResult && !recoveryError && (
-            <RecoveryAnalysisForm
-              onSubmit={handleRecoverySubmit}
-              isLoading={isRecoveryLoading}
-            />
+            <RecoveryAnalysisForm onSubmit={handleRecoverySubmit} isLoading={isRecoveryLoading} />
           )}
-
           {isRecoveryLoading && (
-            <LoadingState
-              title="Auditing Account Recovery Architecture..."
-              message="Evaluating knowledge-based question predictability, emergency backup code readiness, and recovery channel isolation."
-            />
+            <LoadingState title="Auditing Recovery Security..." message="Evaluating backup channels, security questions, and recovery isolation." />
           )}
-
           {recoveryError && !isRecoveryLoading && (
-            <ErrorState
-              title="Account Recovery Audit Failed"
-              message={recoveryError}
-              onRetry={() => setRecoveryError(null)}
-            />
+            <ErrorState title="Recovery Audit Failed" message={recoveryError} onRetry={() => setRecoveryError(null)} />
           )}
-
           {!isRecoveryLoading && !recoveryError && recoveryResult && (
             <div className="space-y-4">
               <div className="flex justify-end">
@@ -484,10 +364,8 @@ export const ScanPage: React.FC = () => {
                   onClick={async () => {
                     try {
                       const rep = await api.createReport({
-                        report_title: "Account Recovery Architecture Audit",
-                        identity_data: {
-                          username: "recovery_audit",
-                        }
+                        report_title: "Account Recovery Audit",
+                        identity_data: { username: "recovery_audit" },
                       });
                       navigate(`/report?id=${rep.id}`);
                     } catch (e) {
@@ -496,7 +374,7 @@ export const ScanPage: React.FC = () => {
                   }}
                   leftIcon={<FileText className="w-4 h-4" />}
                 >
-                  Save as Official Report
+                  Save Report
                 </Button>
               </div>
               <RecoveryResultsView

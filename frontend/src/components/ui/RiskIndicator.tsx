@@ -23,14 +23,14 @@ export const RiskIndicator: React.FC<RiskIndicatorProps> = ({
   const getIcon = () => {
     switch (level) {
       case "CRITICAL":
-        return <Flame className="w-4 h-4 text-rose-400" />;
+        return <Flame className="w-4 h-4 text-red-400" />;
       case "HIGH":
         return <ShieldAlert className="w-4 h-4 text-amber-400" />;
       case "MEDIUM":
-        return <AlertTriangle className="w-4 h-4 text-cyan-400" />;
+        return <AlertTriangle className="w-4 h-4 text-green-400" />;
       case "LOW":
       default:
-        return <ShieldCheck className="w-4 h-4 text-emerald-400" />;
+        return <ShieldCheck className="w-4 h-4 text-green-400" />;
     }
   };
 

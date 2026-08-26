@@ -21,7 +21,7 @@ export const Badge: React.FC<BadgeProps> = ({
     md: "px-2.5 py-1 text-xs font-semibold tracking-wide",
   };
 
-  let styleClasses = "bg-slate-800 text-slate-300 border border-slate-700";
+  let styleClasses = "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700";
 
   if (severity) {
     const s = getSeverityStyle(severity);

@@ -31,9 +31,10 @@ async def register(
     """Register a new user account."""
     existing_user = db.query(UserModel).filter(UserModel.email == request.email.lower().strip()).first()
     if existing_user:
+        # Generic message prevents email enumeration attacks
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="An account with this email address already exists.",
+            detail="Registration could not be completed.",
         )
 
     # Hash password securely

@@ -25,17 +25,17 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
 
   const heightStyles = {
     sm: "h-1.5",
-    md: "h-2.5",
-    lg: "h-4",
+    md: "h-2",
+    lg: "h-3",
   };
 
   return (
     <div className={cn("w-full space-y-1.5", className)}>
       {(label || showValue) && (
         <div className="flex justify-between items-center text-xs font-medium">
-          <span className="text-slate-700 dark:text-slate-300 flex items-center gap-1.5 font-sans">
+          <span className="text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 font-sans">
             {label}
-            {sublabel && <span className="text-slate-500 dark:text-slate-400 text-[11px]">({sublabel})</span>}
+            {sublabel && <span className="text-zinc-500 dark:text-zinc-500 text-[11px]">({sublabel})</span>}
           </span>
           {showValue && (
             <span className={cn("font-mono font-semibold", colorInfo.text)}>
@@ -44,13 +44,10 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
           )}
         </div>
       )}
-      <div className={cn("w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-300 dark:border-slate-700/50", heightStyles[size])}>
+      <div className={cn("w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden", heightStyles[size])}>
         <div
           className={cn("h-full rounded-full transition-all duration-700 ease-out", colorInfo.text.replace("text-", "bg-"))}
-          style={{
-            width: `${percentage}%`,
-            boxShadow: `0 0 10px ${colorInfo.stroke}66`,
-          }}
+          style={{ width: `${percentage}%` }}
         />
       </div>
     </div>

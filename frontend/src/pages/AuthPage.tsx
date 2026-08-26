@@ -17,7 +17,6 @@ export const AuthPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // If already authenticated, redirect to dashboard
   if (isAuthenticated) {
     navigate("/dashboard");
     return null;
@@ -64,13 +63,13 @@ export const AuthPage: React.FC = () => {
     <div className="max-w-md mx-auto py-8 space-y-6">
       {/* Brand Header */}
       <div className="text-center space-y-2">
-        <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mx-auto shadow-glow-cyan">
+        <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/30 flex items-center justify-center text-green-500 dark:text-green-400 mx-auto">
           <Shield className="w-6 h-6" />
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-100 font-sans">
-          {isRegister ? "Create Guardian Account" : "Access Guardian Dashboard"}
+        <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white font-sans">
+          {isRegister ? "Create Account" : "Sign In to Dashboard"}
         </h2>
-        <p className="text-xs font-mono text-slate-400">
+        <p className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
           {isRegister
             ? "Track historical posture, secure persistent reports & monitor exposures."
             : "Sign in to manage your digital identity posture and audits."}
@@ -78,8 +77,8 @@ export const AuthPage: React.FC = () => {
       </div>
 
       <Card variant="cyber" className="p-6 space-y-6">
-        {/* Toggle Mode Tabs */}
-        <div className="grid grid-cols-2 p-1 rounded-lg bg-slate-950/80 border border-slate-800 text-xs font-mono">
+        {/* Toggle Tabs */}
+        <div className="grid grid-cols-2 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-mono">
           <button
             type="button"
             onClick={() => {
@@ -88,8 +87,8 @@ export const AuthPage: React.FC = () => {
             }}
             className={`py-2 rounded-md transition-all font-semibold ${
               !isRegister
-                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-glow-cyan"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/30"
+                : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
             }`}
           >
             Sign In
@@ -102,8 +101,8 @@ export const AuthPage: React.FC = () => {
             }}
             className={`py-2 rounded-md transition-all font-semibold ${
               isRegister
-                ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-glow-cyan"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/30"
+                : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
             }`}
           >
             Register
@@ -111,20 +110,20 @@ export const AuthPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-xs text-rose-300 font-mono">
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-500 font-mono">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Full Name (Only on Registration) */}
+          {/* Full Name */}
           {isRegister && (
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase text-slate-300">
-                Full Name <span className="text-slate-500">(Optional)</span>
+              <label className="block text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300">
+                Full Name <span className="text-zinc-400">(Optional)</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
                   <User className="w-4 h-4" />
                 </div>
                 <input
@@ -132,7 +131,7 @@ export const AuthPage: React.FC = () => {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Alex Mercer"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 font-mono text-sm"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-green-500 font-mono text-sm"
                   disabled={isLoading}
                 />
               </div>
@@ -141,11 +140,11 @@ export const AuthPage: React.FC = () => {
 
           {/* Email */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-mono uppercase text-slate-300">
-              Email Address <span className="text-cyan-400">*</span>
+            <label className="block text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300">
+              Email Address <span className="text-green-500">*</span>
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
                 <Mail className="w-4 h-4" />
               </div>
               <input
@@ -153,8 +152,8 @@ export const AuthPage: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="guardian@example.com"
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 font-mono text-sm"
+                placeholder="you@example.com"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-green-500 font-mono text-sm"
                 disabled={isLoading}
               />
             </div>
@@ -162,11 +161,11 @@ export const AuthPage: React.FC = () => {
 
           {/* Password */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-mono uppercase text-slate-300">
-              Password <span className="text-cyan-400">*</span>
+            <label className="block text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300">
+              Password <span className="text-green-500">*</span>
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
                 <Lock className="w-4 h-4" />
               </div>
               <input
@@ -174,20 +173,20 @@ export const AuthPage: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500 font-mono text-sm"
+                placeholder="Enter password"
+                className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white placeholder:text-zinc-400 focus:outline-none focus:border-green-500 font-mono text-sm"
                 disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300"
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             {isRegister && (
-              <p className="text-[11px] text-slate-500 font-mono">Minimum 8 characters.</p>
+              <p className="text-[11px] text-zinc-400 font-mono">Minimum 8 characters.</p>
             )}
           </div>
 
@@ -199,7 +198,7 @@ export const AuthPage: React.FC = () => {
               isLoading={isLoading}
               rightIcon={<ArrowRight className="w-4 h-4" />}
             >
-              {isRegister ? "Create Free Account" : "Sign In to Dashboard"}
+              {isRegister ? "Create Account" : "Sign In"}
             </Button>
           </div>
         </form>

@@ -42,7 +42,7 @@ def test_register_duplicate_email():
     assert res2.status_code == 400
     data = res2.json()
     assert data["success"] is False
-    assert "already exists" in data["error"]["message"]
+    assert "Registration could not be completed" in data["error"]["message"]
 
 
 def test_register_weak_password():

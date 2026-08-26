@@ -1,10 +1,21 @@
 """Tests for Admin Analytics Telemetry and Production Security Hardening."""
 
+import uuid
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app)
+
+
+def _get_admin_token():
+    """Register an admin user and return auth token."""
+    email = f"admin_{uuid.uuid4().hex[:8]}@example.com"
+    res = client.post("/api/v1/auth/register", json={
+        "email": email,
+        "password": "AdminPassword123!",
+    })
+    return res.json()["data"]["access_token"]
 
 
 def test_security_headers_enforcement():
@@ -19,18 +30,30 @@ def test_security_headers_enforcement():
     assert headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
 
 
+def test_admin_analytics_requires_auth():
+    """Verify admin analytics endpoint requires authentication."""
+    resp = client.get("/api/v1/admin/analytics")
+    assert resp.status_code == 401
+
+
 def test_admin_analytics_aggregation():
     """Verify GET /api/v1/admin/analytics computes anonymized fleet telemetry."""
-    # Seed a sample report
+    # Get authenticated token
+    token = _get_admin_token()
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Seed a sample report (authenticated)
+    report_headers = headers.copy()
     client.post(
         "/api/v1/reports",
         json={
             "report_title": "Fleet Test Report",
             "identity_data": {"username": "fleet_agent_01"},
         },
+        headers=report_headers,
     )
 
-    resp = client.get("/api/v1/admin/analytics")
+    resp = client.get("/api/v1/admin/analytics", headers=headers)
     assert resp.status_code == 200
     data = resp.json()
     assert data["success"] is True
@@ -48,11 +71,14 @@ def test_admin_analytics_aggregation():
 
 def test_admin_analytics_zero_pii_guarantee():
     """Verify admin telemetry never leaks user emails, names, or passwords."""
-    resp = client.get("/api/v1/admin/analytics")
+    token = _get_admin_token()
+    headers = {"Authorization": f"Bearer {token}"}
+
+    resp = client.get("/api/v1/admin/analytics", headers=headers)
     assert resp.status_code == 200
     raw_text = resp.text
 
     # Verify zero user identifiers or credential hashes in telemetry
     forbidden_tokens = ["@secure.internal", "hashed_password", "$2b$", "agent_alpha", "john_doe"]
-    for token in forbidden_tokens:
-        assert token not in raw_text
+    for token_str in forbidden_tokens:
+        assert token_str not in raw_text

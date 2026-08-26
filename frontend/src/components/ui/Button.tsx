@@ -21,7 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyber-darkest disabled:opacity-50 disabled:cursor-not-allowed select-none";
+  const baseStyles = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed select-none";
 
   const sizeStyles = {
     sm: "px-3 py-1.5 text-xs gap-1.5",
@@ -30,11 +30,11 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const variantStyles = {
-    primary: "bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-glow-cyan focus:ring-cyan-400 font-semibold active:scale-[0.98]",
-    secondary: "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 focus:ring-slate-400 active:scale-[0.98]",
-    outline: "bg-transparent hover:bg-cyan-500/10 text-cyan-400 border border-cyan-500/40 hover:border-cyan-400 focus:ring-cyan-400",
-    ghost: "bg-transparent hover:bg-slate-800/60 text-slate-300 hover:text-slate-100 focus:ring-slate-500",
-    danger: "bg-rose-600 hover:bg-rose-500 text-white shadow-glow-danger focus:ring-rose-500 active:scale-[0.98]",
+    primary: "bg-green-500 hover:bg-green-400 text-black font-semibold active:scale-[0.98]",
+    secondary: "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 active:scale-[0.98]",
+    outline: "bg-transparent hover:bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/40 hover:border-green-400",
+    ghost: "bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100",
+    danger: "bg-red-500 hover:bg-red-400 text-white active:scale-[0.98]",
   };
 
   return (
