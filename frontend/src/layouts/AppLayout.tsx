@@ -20,9 +20,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
-    api.checkHealth()
-      .then(() => setBackendHealthy(true))
-      .catch(() => setBackendHealthy(false));
+    let intervalId: any;
+    const check = () => {
+      api.checkHealth()
+        .then(() => {
+          setBackendHealthy(true);
+        })
+        .catch(() => {
+          setBackendHealthy(false);
+        });
+    };
+
+    check();
+    intervalId = setInterval(check, 4000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const navLinks = [
@@ -45,6 +56,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white transition-colors duration-200">
+      {backendHealthy === false && (
+        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-center text-xs font-mono text-amber-700 dark:text-amber-300 flex items-center justify-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+          <span>
+            Waking up backend API service... (Render free tier takes ~30-45s on first visit). Retrying automatically.
+          </span>
+        </div>
+      )}
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 bg-white dark:bg-black border-b border-zinc-200 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

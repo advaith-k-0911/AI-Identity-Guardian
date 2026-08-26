@@ -23,18 +23,29 @@ app = FastAPI(
     redoc_url="/redoc" if settings.DEBUG else None,
 )
 
-# Attach Security Headers & Rate Limiting Middleware
+# 1. Security Headers & Rate Limiting Middleware
 app.add_middleware(SecurityHeadersMiddleware)
-app.add_middleware(RateLimitingMiddleware, max_requests=60, window_seconds=60)
+app.add_middleware(RateLimitingMiddleware, max_requests=150, window_seconds=60)
 
-# CORS Middleware setup
-if settings.CORS_ORIGINS:
+# 2. CORS Middleware (Added last so it wraps as outermost middleware)
+cors_origins = settings.CORS_ORIGINS if isinstance(settings.CORS_ORIGINS, list) else [settings.CORS_ORIGINS]
+if "*" in cors_origins:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.CORS_ORIGINS,
+        allow_origin_regex=r"https?://.*",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"],
     )
 
 
