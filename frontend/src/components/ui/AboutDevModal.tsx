@@ -15,7 +15,7 @@ const devs = [
   },
   {
     name: "Anshaf Kurikkal",
-    role: "Contributor",
+    role: "B.Tech AI-DS Student",
     linkedin: "http://www.linkedin.com/in/anshaf-kurikkal-22mar2005",
     github: "https://github.com/anshaf-123",
   },
