@@ -31,7 +31,21 @@ import {
   AdminAnalyticsResponse,
 } from "../types";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
+const getApiBaseUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && typeof envUrl === "string" && envUrl.trim() !== "" && !envUrl.startsWith("/")) {
+    return envUrl.trim().replace(/\/+$/, "");
+  }
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host.includes("onrender.com")) {
+      return "https://ai-identity-guardian-api.onrender.com/api/v1";
+    }
+  }
+  return "http://localhost:8000/api/v1";
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 class ApiClient {
   private token: string | null = null;
