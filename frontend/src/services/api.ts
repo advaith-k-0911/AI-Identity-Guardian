@@ -31,7 +31,14 @@ import {
   AdminAnalyticsResponse,
 } from "../types";
 
-const getApiBaseUrl = (): string => {
+export const getApiBaseUrl = (): string => {
+  if (typeof window !== "undefined") {
+    const custom = localStorage.getItem("custom_api_url");
+    if (custom && custom.trim() !== "") {
+      const clean = custom.trim().replace(/\/+$/, "");
+      return clean.endsWith("/api/v1") ? clean : `${clean}/api/v1`;
+    }
+  }
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl && typeof envUrl === "string" && envUrl.trim() !== "" && !envUrl.startsWith("/")) {
     return envUrl.trim().replace(/\/+$/, "");
@@ -44,8 +51,6 @@ const getApiBaseUrl = (): string => {
   }
   return "http://localhost:8000/api/v1";
 };
-
-const API_BASE_URL = getApiBaseUrl();
 
 class ApiClient {
   private token: string | null = null;
@@ -71,7 +76,8 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint}`;
+    const baseUrl = getApiBaseUrl();
+    const url = endpoint.startsWith("http") ? endpoint : `${baseUrl}${endpoint}`;
     
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
