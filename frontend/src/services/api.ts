@@ -29,22 +29,13 @@ import {
 } from "../types";
 
 export const getApiBaseUrl = (): string => {
-  // 1. User custom override from localStorage
-  if (typeof window !== "undefined") {
-    const custom = localStorage.getItem("custom_api_url");
-    if (custom && custom.trim() !== "") {
-      const clean = custom.trim().replace(/\/+$/, "");
-      return clean.endsWith("/api/v1") ? clean : `${clean}/api/v1`;
-    }
-  }
-
-  // 2. Build-time environment variable
+  // 1. Build-time environment variable
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl && typeof envUrl === "string" && envUrl.trim() !== "" && !envUrl.startsWith("/")) {
     return envUrl.trim().replace(/\/+$/, "");
   }
 
-  // 3. Render production auto-detection
+  // 2. Render production auto-detection
   if (typeof window !== "undefined") {
     const host = window.location.hostname;
     if (host.includes("onrender.com")) {
@@ -52,7 +43,7 @@ export const getApiBaseUrl = (): string => {
     }
   }
 
-  // 4. Local development fallback
+  // 3. Local development fallback
   return "http://localhost:8000/api/v1";
 };
 
@@ -61,6 +52,10 @@ class ApiClient {
 
   constructor() {
     this.token = localStorage.getItem("token");
+    // Clear any legacy custom_api_url that might have been stored during debugging
+    if (typeof localStorage !== "undefined") {
+      localStorage.removeItem("custom_api_url");
+    }
   }
 
   setToken(token: string | null) {
@@ -95,7 +90,7 @@ class ApiClient {
     }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     try {
       const response = await fetch(url, {
@@ -115,9 +110,9 @@ class ApiClient {
       return data.data as T;
     } catch (error: any) {
       if (error.name === "AbortError") {
-        throw new Error(`Request to ${url} timed out. Backend may be waking up.`);
+        throw new Error(`Request timed out. Backend may be waking up.`);
       }
-      console.error(`API Error [${url}]:`, error);
+      console.warn(`[AI Identity Guardian] API request failed for ${url}:`, error);
       throw error;
     } finally {
       clearTimeout(timeoutId);
@@ -125,20 +120,19 @@ class ApiClient {
   }
 
   /**
-   * Health Check endpoint - probes API and root health
+   * Health Check endpoint - verifies backend connectivity
    */
   async checkHealth(): Promise<{ status: string; app_name: string; version: string }> {
     try {
       return await this.request<{ status: string; app_name: string; version: string }>("/health");
     } catch (err) {
-      // Fallback probe to root /health on base domain if v1 endpoint failed
+      // Fallback probe to root /health on base domain if needed
       const baseUrl = getApiBaseUrl();
       const origin = baseUrl.replace(/\/api\/v1\/?$/, "");
-      const rootUrl = `${origin}/health`;
-      const res = await fetch(rootUrl, { mode: "cors" });
+      const res = await fetch(`${origin}/health`, { mode: "cors" });
       const data = await res.json();
-      if (res.ok && data.success) {
-        return data.data;
+      if (res.ok && (data.success || data.data?.status === "healthy")) {
+        return data.data || { status: "healthy", app_name: "AI Identity Guardian", version: "0.1.0" };
       }
       throw err;
     }
