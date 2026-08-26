@@ -93,6 +93,23 @@ async def generic_exception_handler(request: Request, exc: Exception):
     )
 
 
+# Root Index endpoint
+@app.get("/", response_model=APIResponse[dict], tags=["System"])
+async def root_index():
+    """Root index endpoint providing operational status."""
+    return APIResponse(
+        success=True,
+        data={
+            "status": "healthy",
+            "app_name": settings.APP_NAME,
+            "version": settings.APP_VERSION,
+            "environment": settings.ENVIRONMENT,
+            "api_v1_prefix": settings.API_V1_STR,
+        },
+        message="AI Identity Guardian API is operational."
+    )
+
+
 # Root Health Check endpoint
 @app.get("/health", response_model=APIResponse[dict], tags=["System"])
 async def root_health():

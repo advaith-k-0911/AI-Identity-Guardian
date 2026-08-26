@@ -7,6 +7,16 @@ from app.main import app
 client = TestClient(app)
 
 
+def test_root_index_endpoint():
+    """Verify GET / returns operational status."""
+    response = client.get("/")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["data"]["status"] == "healthy"
+    assert data["data"]["app_name"] == "AI Identity Guardian"
+
+
 def test_root_health_endpoint():
     """Verify GET /health returns operational status."""
     response = client.get("/health")
