@@ -28,9 +28,10 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitingMiddleware, max_requests=150, window_seconds=60)
 
 # 2. CORS Middleware (Added last so it wraps as outermost middleware)
+# Use the configured CORS_ORIGINS list from settings (set via render.yaml env var).
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https?://.*",
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

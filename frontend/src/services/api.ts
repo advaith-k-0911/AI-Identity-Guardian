@@ -29,6 +29,7 @@ import {
 } from "../types";
 
 export const getApiBaseUrl = (): string => {
+  // 1. User-configured custom URL (highest priority)
   if (typeof window !== "undefined") {
     const custom = localStorage.getItem("custom_api_url");
     if (custom && custom.trim() !== "") {
@@ -36,16 +37,19 @@ export const getApiBaseUrl = (): string => {
       return clean.endsWith("/api/v1") ? clean : `${clean}/api/v1`;
     }
   }
+  // 2. VITE_API_URL environment variable (set in render.yaml for production)
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl && typeof envUrl === "string" && envUrl.trim() !== "" && !envUrl.startsWith("/")) {
     return envUrl.trim().replace(/\/+$/, "");
   }
+  // 3. Hostname-based detection for Render deployments
   if (typeof window !== "undefined") {
     const host = window.location.hostname;
     if (host.includes("onrender.com")) {
       return "https://ai-identity-guardian-api.onrender.com/api/v1";
     }
   }
+  // 4. Local development fallback
   return "http://localhost:8000/api/v1";
 };
 

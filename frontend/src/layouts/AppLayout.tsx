@@ -23,18 +23,28 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   useEffect(() => {
     let intervalId: any;
+    let currentInterval = 5000;
+    const FAST_INTERVAL = 5000;     // 5s when online or first check
+    const SLOW_INTERVAL = 15000;    // 15s when backend is down (Render spin-down)
+
     const check = () => {
       api.checkHealth()
         .then(() => {
           setBackendHealthy(true);
+          currentInterval = FAST_INTERVAL;
         })
         .catch(() => {
           setBackendHealthy(false);
+          currentInterval = SLOW_INTERVAL;
+        })
+        .finally(() => {
+          clearInterval(intervalId);
+          intervalId = setInterval(check, currentInterval);
         });
     };
 
     check();
-    intervalId = setInterval(check, 3500);
+    intervalId = setInterval(check, currentInterval);
     return () => clearInterval(intervalId);
   }, []);
 

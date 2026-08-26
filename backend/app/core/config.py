@@ -60,7 +60,12 @@ class Settings(BaseSettings):
     DIESS_THRESHOLD_HIGH: float = 25.0
 
     # CORS Configuration
-    CORS_ORIGINS: Union[List[str], str] = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]
+    CORS_ORIGINS: Union[List[str], str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "https://ai-identity-guardian-app.onrender.com",
+    ]
 
     # Database
     DATABASE_URL: str = "sqlite:///./ai_identity_guardian.db"
