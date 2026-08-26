@@ -1,27 +1,24 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Shield, Scan, LayoutDashboard, FileText, Menu, X, Lock, User, LogOut, LogIn, Sun, Moon, Users, Server, RefreshCw, AlertTriangle } from "lucide-react";
+import { Shield, Scan, LayoutDashboard, FileText, Menu, X, Lock, User, LogOut, LogIn, Sun, Moon, Users, RefreshCw, AlertTriangle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
-import { api, getApiBaseUrl } from "../services/api";
+import { api } from "../services/api";
 import { AboutDevModal } from "../components/ui/AboutDevModal";
 
 export interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-type ConnectionStatus = "connecting" | "waking_up" | "online" | "offline" | "failed";
+type ConnectionStatus = "connecting" | "waking_up" | "online" | "offline";
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [aboutDevOpen, setAboutDevOpen] = useState(false);
-  const [serverModalOpen, setServerModalOpen] = useState(false);
-  const [customUrlInput, setCustomUrlInput] = useState(() => localStorage.getItem("custom_api_url") || "");
   
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("connecting");
   const [retryCount, setRetryCount] = useState(0);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [lastErrorMessage, setLastErrorMessage] = useState<string | null>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,22 +26,28 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
 
   const retryTimerRef = useRef<any>(null);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const checkConnection = useCallback(async (isManual = false) => {
     if (isManual) setIsRetrying(true);
 
     try {
       await api.checkHealth();
+      if (!isMountedRef.current) return;
       setConnectionStatus("online");
       setRetryCount(0);
-      setLastErrorMessage(null);
-    } catch (err: any) {
-      const msg = err?.message || "Failed to reach backend";
-      setLastErrorMessage(msg);
-
+    } catch {
+      if (!isMountedRef.current) return;
       setRetryCount((prev) => {
         const next = prev + 1;
-        if (next < 5) {
+        if (next <= 7) {
           setConnectionStatus("waking_up");
         } else {
           setConnectionStatus("offline");
@@ -52,15 +55,17 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         return next;
       });
     } finally {
-      if (isManual) setIsRetrying(false);
+      if (isMountedRef.current && isManual) {
+        setIsRetrying(false);
+      }
     }
   }, []);
 
   useEffect(() => {
     checkConnection();
 
-    // Auto-polling interval: 4s when waking up/connecting, 15s when online or offline
-    const intervalTime = connectionStatus === "online" ? 15000 : 4000;
+    // Auto-polling: 4.5s when waking up/connecting (cold start), 20s when online or offline
+    const intervalTime = connectionStatus === "online" ? 20000 : 4500;
     retryTimerRef.current = setInterval(() => {
       checkConnection();
     }, intervalTime);
@@ -70,14 +75,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     };
   }, [checkConnection, connectionStatus]);
 
-  const handleSaveServerUrl = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (customUrlInput.trim()) {
-      localStorage.setItem("custom_api_url", customUrlInput.trim());
-    } else {
-      localStorage.removeItem("custom_api_url");
-    }
-    setServerModalOpen(false);
+  const handleManualRetry = () => {
     setConnectionStatus("connecting");
     setRetryCount(0);
     checkConnection(true);
@@ -103,7 +101,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white transition-colors duration-200">
-      {/* Dynamic Backend Status Banner */}
+      {/* User-Facing Status Banner (No raw technical URLs) */}
       {connectionStatus !== "online" && (
         <div
           className={`border-b px-4 py-2.5 text-xs font-mono transition-all flex flex-wrap items-center justify-center gap-3 ${
@@ -112,48 +110,39 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               : "bg-rose-500/10 border-rose-500/30 text-rose-800 dark:text-rose-300"
           }`}
         >
+          {connectionStatus === "connecting" && (
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+              <span>Backend connecting...</span>
+            </div>
+          )}
+
           {connectionStatus === "waking_up" && (
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
               <span>
-                Backend Waking Up... (Attempt {retryCount}/5). Render free tier takes ~30–45s on first visit.
+                Backend waking up... (Attempt {retryCount}/7 • Render free tier may take ~30–45s on first visit)
               </span>
             </div>
           )}
 
-          {connectionStatus === "connecting" && (
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-              <span>Connecting to Backend API... ({getApiBaseUrl()})</span>
-            </div>
-          )}
-
-          {(connectionStatus === "offline" || connectionStatus === "failed") && (
+          {connectionStatus === "offline" && (
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-rose-500 flex-shrink-0" />
               <span>
-                Backend Unavailable ({getApiBaseUrl()}). {lastErrorMessage ? `Details: ${lastErrorMessage}` : "Service may be sleeping or restarting."}
+                Backend unavailable. The backend service may be starting up or temporarily offline.
               </span>
             </div>
           )}
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => checkConnection(true)}
-              disabled={isRetrying}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-current text-[11px] font-semibold transition-all disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3 h-3 ${isRetrying ? "animate-spin" : ""}`} />
-              <span>{isRetrying ? "Checking..." : "Retry Connection"}</span>
-            </button>
-
-            <button
-              onClick={() => setServerModalOpen(true)}
-              className="px-2.5 py-1 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-current text-[11px] font-semibold underline"
-            >
-              Configure URL
-            </button>
-          </div>
+          <button
+            onClick={handleManualRetry}
+            disabled={isRetrying}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-current text-[11px] font-semibold transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3 h-3 ${isRetrying ? "animate-spin" : ""}`} />
+            <span>{isRetrying ? "Checking..." : "Retry Connection"}</span>
+          </button>
         </div>
       )}
 
@@ -229,10 +218,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </button>
 
               {/* Backend Status Badge */}
-              <button
-                onClick={() => setServerModalOpen(true)}
-                title="Click to view or change Backend API URL"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-green-500/50 transition-colors"
+              <div
+                title={
+                  connectionStatus === "online"
+                    ? "Backend service is operational"
+                    : connectionStatus === "waking_up"
+                    ? "Backend is spinning up on Render"
+                    : "Backend is currently unreachable"
+                }
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800"
               >
                 <span
                   className={`w-2 h-2 rounded-full ${
@@ -250,7 +244,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                     ? "WAKING UP"
                     : "OFFLINE"}
                 </span>
-              </button>
+              </div>
 
               {/* User Authentication Status */}
               {isAuthenticated ? (
@@ -335,17 +329,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               <span>About Dev</span>
             </button>
 
-            <button
-              onClick={() => {
-                setServerModalOpen(true);
-                setMobileMenuOpen(false);
-              }}
-              className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900"
-            >
-              <Server className="w-5 h-5 text-green-500" />
-              <span>Server Connection Settings</span>
-            </button>
-
             <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
               {isAuthenticated ? (
                 <button
@@ -395,87 +378,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {/* About Dev Modal */}
       <AboutDevModal isOpen={aboutDevOpen} onClose={() => setAboutDevOpen(false)} />
-
-      {/* Backend Server URL Config Modal */}
-      {serverModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <Server className="w-5 h-5 text-green-500" />
-                <h3 className="text-lg font-bold text-black dark:text-white font-sans">
-                  Backend API Connection
-                </h3>
-              </div>
-              <button
-                onClick={() => setServerModalOpen(false)}
-                className="text-zinc-400 hover:text-black dark:hover:text-white p-1"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              Target API Base: <strong className="text-green-600 dark:text-green-400 font-mono">{getApiBaseUrl()}</strong>
-            </p>
-
-            <form onSubmit={handleSaveServerUrl} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono text-zinc-700 dark:text-zinc-300 uppercase font-semibold">
-                  Backend Service URL:
-                </label>
-                <input
-                  type="text"
-                  value={customUrlInput}
-                  onChange={(e) => setCustomUrlInput(e.target.value)}
-                  placeholder="https://ai-identity-guardian-api.onrender.com"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-sm text-black dark:text-white font-mono focus:outline-none focus:border-green-500"
-                />
-              </div>
-
-              <div className="flex flex-wrap gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setCustomUrlInput("https://ai-identity-guardian-api.onrender.com")}
-                  className="text-[11px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:border-green-500 text-zinc-700 dark:text-zinc-300"
-                >
-                  Render Production
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCustomUrlInput("http://localhost:8000")}
-                  className="text-[11px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:border-green-500 text-zinc-700 dark:text-zinc-300"
-                >
-                  Localhost:8000
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCustomUrlInput("")}
-                  className="text-[11px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:border-rose-500 text-rose-500"
-                >
-                  Clear Custom Override
-                </button>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
-                <button
-                  type="button"
-                  onClick={() => setServerModalOpen(false)}
-                  className="px-4 py-2 text-xs font-mono text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 text-xs font-mono font-bold bg-green-500 hover:bg-green-600 text-black rounded-lg transition-colors"
-                >
-                  Save & Connect
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

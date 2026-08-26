@@ -23,15 +23,16 @@ app = FastAPI(
     redoc_url="/redoc" if settings.DEBUG else None,
 )
 
-# 1. Security Headers & Rate Limiting Middleware
+# 1. Security & Rate Limiting Middleware (executed after CORS in onion model)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RateLimitingMiddleware, max_requests=150, window_seconds=60)
 
-# 2. CORS Middleware (Added last so it wraps as outermost middleware)
-# Use the configured CORS_ORIGINS list from settings (set via render.yaml env var).
+# 2. CORS Middleware (Added LAST so it wraps as the outermost middleware)
+# Handles all incoming browser preflight OPTIONS requests before other middlewares.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
+    allow_origin_regex=r"https://ai-identity-guardian-app(-[a-z0-9]+)?\.onrender\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -92,10 +93,10 @@ async def generic_exception_handler(request: Request, exc: Exception):
     )
 
 
-# Root Health Check
+# Root Health Check endpoint
 @app.get("/health", response_model=APIResponse[dict], tags=["System"])
 async def root_health():
-    """Root health check endpoint."""
+    """Root health check endpoint for monitoring & cold-start detection."""
     return APIResponse(
         success=True,
         data={
