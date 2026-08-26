@@ -1,0 +1,28 @@
+Add the **GNU Affero General Public License v3.0 (AGPL-3.0)** to this existing repository.
+
+Requirements:
+
+1. Create a file named exactly:
+   `LICENSE`
+
+2. Use the official **GNU Affero General Public License v3.0** text.
+
+3. Place `LICENSE` in the root of the repository.
+
+4. Do not modify or delete any existing source code.
+
+5. Do not modify the Git history.
+
+6. Do not change any existing functionality.
+
+7. Add the appropriate copyright holder and year for this project.
+
+8. Update `README.md` only if necessary to clearly state that the project is licensed under **AGPL-3.0**.
+
+9. Verify that the license is correctly detected as:
+   `AGPL-3.0`
+
+10. Commit the change with a simple message such as:
+   `Add AGPL-3.0 license`
+
+Do not use MIT, GPL-3.0, Apache-2.0, or any other license. I specifically want **GNU AGPL-3.0**.
