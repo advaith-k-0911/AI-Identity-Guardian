@@ -29,7 +29,7 @@ import {
 } from "../types";
 
 export const getApiBaseUrl = (): string => {
-  // 1. User-configured custom URL (highest priority)
+  // 1. User custom override from localStorage
   if (typeof window !== "undefined") {
     const custom = localStorage.getItem("custom_api_url");
     if (custom && custom.trim() !== "") {
@@ -37,18 +37,21 @@ export const getApiBaseUrl = (): string => {
       return clean.endsWith("/api/v1") ? clean : `${clean}/api/v1`;
     }
   }
-  // 2. VITE_API_URL environment variable (set in render.yaml for production)
+
+  // 2. Build-time environment variable
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl && typeof envUrl === "string" && envUrl.trim() !== "" && !envUrl.startsWith("/")) {
     return envUrl.trim().replace(/\/+$/, "");
   }
-  // 3. Hostname-based detection for Render deployments
+
+  // 3. Render production auto-detection
   if (typeof window !== "undefined") {
     const host = window.location.hostname;
     if (host.includes("onrender.com")) {
       return "https://ai-identity-guardian-api.onrender.com/api/v1";
     }
   }
+
   // 4. Local development fallback
   return "http://localhost:8000/api/v1";
 };
@@ -91,8 +94,13 @@ class ApiClient {
       headers["Authorization"] = `Bearer ${currentToken}`;
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
+
     try {
       const response = await fetch(url, {
+        mode: "cors",
+        signal: options.signal || controller.signal,
         ...options,
         headers,
       });
@@ -106,16 +114,34 @@ class ApiClient {
 
       return data.data as T;
     } catch (error: any) {
+      if (error.name === "AbortError") {
+        throw new Error(`Request to ${url} timed out. Backend may be waking up.`);
+      }
       console.error(`API Error [${url}]:`, error);
       throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
   /**
-   * Health Check endpoint
+   * Health Check endpoint - probes API and root health
    */
   async checkHealth(): Promise<{ status: string; app_name: string; version: string }> {
-    return this.request<{ status: string; app_name: string; version: string }>("/health");
+    try {
+      return await this.request<{ status: string; app_name: string; version: string }>("/health");
+    } catch (err) {
+      // Fallback probe to root /health on base domain if v1 endpoint failed
+      const baseUrl = getApiBaseUrl();
+      const origin = baseUrl.replace(/\/api\/v1\/?$/, "");
+      const rootUrl = `${origin}/health`;
+      const res = await fetch(rootUrl, { mode: "cors" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return data.data;
+      }
+      throw err;
+    }
   }
 
   // --- Authentication Endpoints ---

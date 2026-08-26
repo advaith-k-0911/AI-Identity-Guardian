@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Shield, Scan, LayoutDashboard, FileText, Menu, X, Lock, User, LogOut, LogIn, Sun, Moon, Users, Server } from "lucide-react";
+import { Shield, Scan, LayoutDashboard, FileText, Menu, X, Lock, User, LogOut, LogIn, Sun, Moon, Users, Server, RefreshCw, AlertTriangle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { api, getApiBaseUrl } from "../services/api";
@@ -10,43 +10,65 @@ export interface AppLayoutProps {
   children: React.ReactNode;
 }
 
+type ConnectionStatus = "connecting" | "waking_up" | "online" | "offline" | "failed";
+
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [aboutDevOpen, setAboutDevOpen] = useState(false);
   const [serverModalOpen, setServerModalOpen] = useState(false);
   const [customUrlInput, setCustomUrlInput] = useState(() => localStorage.getItem("custom_api_url") || "");
-  const [backendHealthy, setBackendHealthy] = useState<boolean | null>(null);
+  
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("connecting");
+  const [retryCount, setRetryCount] = useState(0);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [lastErrorMessage, setLastErrorMessage] = useState<string | null>(null);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    let intervalId: any;
-    let currentInterval = 5000;
-    const FAST_INTERVAL = 5000;     // 5s when online or first check
-    const SLOW_INTERVAL = 15000;    // 15s when backend is down (Render spin-down)
+  const retryTimerRef = useRef<any>(null);
 
-    const check = () => {
-      api.checkHealth()
-        .then(() => {
-          setBackendHealthy(true);
-          currentInterval = FAST_INTERVAL;
-        })
-        .catch(() => {
-          setBackendHealthy(false);
-          currentInterval = SLOW_INTERVAL;
-        })
-        .finally(() => {
-          clearInterval(intervalId);
-          intervalId = setInterval(check, currentInterval);
-        });
-    };
+  const checkConnection = useCallback(async (isManual = false) => {
+    if (isManual) setIsRetrying(true);
 
-    check();
-    intervalId = setInterval(check, currentInterval);
-    return () => clearInterval(intervalId);
+    try {
+      await api.checkHealth();
+      setConnectionStatus("online");
+      setRetryCount(0);
+      setLastErrorMessage(null);
+    } catch (err: any) {
+      const msg = err?.message || "Failed to reach backend";
+      setLastErrorMessage(msg);
+
+      setRetryCount((prev) => {
+        const next = prev + 1;
+        if (next < 5) {
+          setConnectionStatus("waking_up");
+        } else {
+          setConnectionStatus("offline");
+        }
+        return next;
+      });
+    } finally {
+      if (isManual) setIsRetrying(false);
+    }
   }, []);
+
+  useEffect(() => {
+    checkConnection();
+
+    // Auto-polling interval: 4s when waking up/connecting, 15s when online or offline
+    const intervalTime = connectionStatus === "online" ? 15000 : 4000;
+    retryTimerRef.current = setInterval(() => {
+      checkConnection();
+    }, intervalTime);
+
+    return () => {
+      if (retryTimerRef.current) clearInterval(retryTimerRef.current);
+    };
+  }, [checkConnection, connectionStatus]);
 
   const handleSaveServerUrl = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,10 +78,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       localStorage.removeItem("custom_api_url");
     }
     setServerModalOpen(false);
-    setBackendHealthy(null);
-    api.checkHealth()
-      .then(() => setBackendHealthy(true))
-      .catch(() => setBackendHealthy(false));
+    setConnectionStatus("connecting");
+    setRetryCount(0);
+    checkConnection(true);
   };
 
   const navLinks = [
@@ -82,19 +103,57 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-black text-black dark:text-white transition-colors duration-200">
-      {/* Backend Warming / Connection Banner */}
-      {backendHealthy === false && (
-        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2.5 text-center text-xs font-mono text-amber-700 dark:text-amber-300 flex flex-wrap items-center justify-center gap-3">
-          <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-          <span>
-            Connecting to backend: <strong className="font-bold underline">{getApiBaseUrl()}</strong> (Render free tier may take ~30–45s to wake up).
-          </span>
-          <button
-            onClick={() => setServerModalOpen(true)}
-            className="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-900 dark:text-amber-200 text-[11px] font-semibold underline"
-          >
-            Change Backend URL
-          </button>
+      {/* Dynamic Backend Status Banner */}
+      {connectionStatus !== "online" && (
+        <div
+          className={`border-b px-4 py-2.5 text-xs font-mono transition-all flex flex-wrap items-center justify-center gap-3 ${
+            connectionStatus === "waking_up" || connectionStatus === "connecting"
+              ? "bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-300"
+              : "bg-rose-500/10 border-rose-500/30 text-rose-800 dark:text-rose-300"
+          }`}
+        >
+          {connectionStatus === "waking_up" && (
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+              <span>
+                Backend Waking Up... (Attempt {retryCount}/5). Render free tier takes ~30–45s on first visit.
+              </span>
+            </div>
+          )}
+
+          {connectionStatus === "connecting" && (
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+              <span>Connecting to Backend API... ({getApiBaseUrl()})</span>
+            </div>
+          )}
+
+          {(connectionStatus === "offline" || connectionStatus === "failed") && (
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-500 flex-shrink-0" />
+              <span>
+                Backend Unavailable ({getApiBaseUrl()}). {lastErrorMessage ? `Details: ${lastErrorMessage}` : "Service may be sleeping or restarting."}
+              </span>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => checkConnection(true)}
+              disabled={isRetrying}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-current text-[11px] font-semibold transition-all disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3 h-3 ${isRetrying ? "animate-spin" : ""}`} />
+              <span>{isRetrying ? "Checking..." : "Retry Connection"}</span>
+            </button>
+
+            <button
+              onClick={() => setServerModalOpen(true)}
+              className="px-2.5 py-1 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 border border-current text-[11px] font-semibold underline"
+            >
+              Configure URL
+            </button>
+          </div>
         </div>
       )}
 
@@ -169,23 +228,27 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 )}
               </button>
 
-              {/* Backend Status & Quick URL Config */}
+              {/* Backend Status Badge */}
               <button
                 onClick={() => setServerModalOpen(true)}
-                title="Click to configure or view Backend API URL"
-                className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-green-500/50 transition-colors"
+                title="Click to view or change Backend API URL"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-green-500/50 transition-colors"
               >
                 <span
                   className={`w-2 h-2 rounded-full ${
-                    backendHealthy === true
+                    connectionStatus === "online"
                       ? "bg-green-500 shadow-[0_0_8px_#22c55e]"
-                      : backendHealthy === false
-                      ? "bg-rose-500 shadow-[0_0_8px_#f43f5e]"
-                      : "bg-amber-400 animate-ping"
+                      : connectionStatus === "waking_up"
+                      ? "bg-amber-400 animate-ping"
+                      : "bg-rose-500 shadow-[0_0_8px_#f43f5e]"
                   }`}
                 />
-                <span className="text-[11px] font-mono text-zinc-600 dark:text-zinc-400 font-semibold">
-                  {backendHealthy === true ? "ONLINE" : "OFFLINE"}
+                <span className="text-[11px] font-mono text-zinc-700 dark:text-zinc-300 font-semibold uppercase">
+                  {connectionStatus === "online"
+                    ? "ONLINE"
+                    : connectionStatus === "waking_up"
+                    ? "WAKING UP"
+                    : "OFFLINE"}
                 </span>
               </button>
 
@@ -353,13 +416,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </div>
 
             <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              Current API Endpoint: <strong className="text-green-600 dark:text-green-400 font-mono">{getApiBaseUrl()}</strong>
+              Target API Base: <strong className="text-green-600 dark:text-green-400 font-mono">{getApiBaseUrl()}</strong>
             </p>
 
             <form onSubmit={handleSaveServerUrl} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-zinc-700 dark:text-zinc-300 uppercase font-semibold">
-                  Custom Backend URL (from Render):
+                  Backend Service URL:
                 </label>
                 <input
                   type="text"
@@ -376,7 +439,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   onClick={() => setCustomUrlInput("https://ai-identity-guardian-api.onrender.com")}
                   className="text-[11px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:border-green-500 text-zinc-700 dark:text-zinc-300"
                 >
-                  Render Default
+                  Render Production
                 </button>
                 <button
                   type="button"
@@ -390,7 +453,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   onClick={() => setCustomUrlInput("")}
                   className="text-[11px] font-mono px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:border-rose-500 text-rose-500"
                 >
-                  Reset
+                  Clear Custom Override
                 </button>
               </div>
 
