@@ -43,8 +43,8 @@ export const getApiBaseUrl = (): string => {
     }
   }
 
-  // 3. Local development fallback
-  return "http://localhost:8000/api/v1";
+  // 3. Local development fallback: use the Vite proxy so CSP connect-src 'self' permits requests.
+  return "/api/v1";
 };
 
 class ApiClient {
