@@ -1,8 +1,15 @@
 # AI Identity Guardian
 
-AI Identity Guardian is an open-source cybersecurity assessment tool designed to evaluate digital identity exposure. It analyzes public handles, profile metadata, impersonation vectors, credential habits, and account recovery configurations to generate an explainable score called the **Digital Identity Exposure and Security Score (DIESS)**.
+> An open-source cybersecurity assessment tool designed to evaluate digital identity exposure, detect OSINT vulnerabilities, and calculate a unified Digital Identity Exposure and Security Score (DIESS).
 
-The system uses deterministic risk engines and an AI-powered explanation service to deliver concrete remediation steps without storing personal data.
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React 18](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![AI Engine](https://img.shields.io/badge/AI_Engine-Gemini_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![License MIT](https://img.shields.io/badge/License-MIT-44CC11?style=for-the-badge)](LICENSE)
 
 ---
 
@@ -191,3 +198,9 @@ The project includes a `render.yaml` configuration file for automated deployment
 ## License
 
 This project is licensed under the MIT License.
+
+---
+
+<p align="center">
+  <sub>Made with ☕, Python, and sleep deprivation by <b>Advaith K</b> &lt;3</sub>
+</p>

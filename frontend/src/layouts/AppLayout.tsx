@@ -304,15 +304,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black mt-auto py-8 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500 dark:text-zinc-400 font-mono">
-          <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <span>ZERO-RETENTION PRIVACY: Inputs are processed transiently and never stored without authorization.</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500 dark:text-zinc-400 font-mono">
+            <div className="flex items-center gap-2">
+              <Lock className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <span>ZERO-RETENTION PRIVACY: Inputs are processed transiently and never stored without authorization.</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span>DIESS v0.1.0</span>
+              <span className="text-zinc-300 dark:text-zinc-700">|</span>
+              <span className="text-green-600 dark:text-green-400 font-semibold">SECURITY ENGINE</span>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span>DIESS v0.1.0</span>
-            <span className="text-zinc-300 dark:text-zinc-700">|</span>
-            <span className="text-green-600 dark:text-green-400 font-semibold">SECURITY ENGINE</span>
+          <div className="pt-3 border-t border-zinc-100 dark:border-zinc-900 text-center text-xs font-mono text-zinc-500 dark:text-zinc-500">
+            Made with ☕, Python, and sleep deprivation by <span className="text-green-600 dark:text-green-400 font-semibold">Advaith K</span> &lt;3
           </div>
         </div>
       </footer>
