@@ -23,19 +23,17 @@ import { ScoreRing } from "../components/ui/ScoreRing";
 import { RiskIndicator } from "../components/ui/RiskIndicator";
 import { ProgressBar } from "../components/ui/ProgressBar";
 import { AdminAnalyticsView } from "../components/admin/AdminAnalyticsView";
-import { useAuth } from "../contexts/AuthContext";
 import { ReportSummaryResponse, DiessGrade } from "../types";
 import { api } from "../services/api";
 
 export const DashboardPage: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
   const [reports, setReports] = useState<ReportSummaryResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dashboardView, setDashboardView] = useState<"posture" | "fleet">("posture");
 
   useEffect(() => {
     loadUserReports();
-  }, [isAuthenticated]);
+  }, []);
 
   const loadUserReports = async () => {
     setIsLoading(true);
@@ -68,18 +66,8 @@ export const DashboardPage: React.FC = () => {
       {/* Dashboard Header */}
       <PageHeader
         title="Security Posture Dashboard"
-        subtitle={
-          isAuthenticated
-            ? `Welcome back, ${user?.full_name || user?.email}. All 5 security dimensions are active.`
-            : "Review composite DIESS posture metrics and multi-vector threat indicators."
-        }
-        badge={
-          isAuthenticated ? (
-            <Badge severity="LOW">AUTHENTICATED</Badge>
-          ) : (
-            <Badge severity="MEDIUM">ANONYMOUS</Badge>
-          )
-        }
+        subtitle="Review composite DIESS posture metrics, multi-vector threat indicators, and fleet telemetry."
+        badge={<Badge severity="LOW">ACTIVE ENGINE</Badge>}
         actions={
           <div className="flex gap-3">
             <Link to="/scan">

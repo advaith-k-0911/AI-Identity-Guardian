@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Shield, Scan, LayoutDashboard, FileText, Menu, X, Lock, User, LogOut, LogIn, Sun, Moon, Users, RefreshCw, AlertTriangle } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+import { Link, useLocation } from "react-router-dom";
+import { Shield, Scan, LayoutDashboard, FileText, Menu, X, Lock, Sun, Moon, Users, RefreshCw, AlertTriangle } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import { api } from "../services/api";
 import { AboutDevModal } from "../components/ui/AboutDevModal";
@@ -21,8 +20,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isRetrying, setIsRetrying] = useState(false);
 
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   const retryTimerRef = useRef<any>(null);
@@ -92,11 +89,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     if (path === "/" && location.pathname === "/") return true;
     if (path !== "/" && location.pathname.startsWith(path)) return true;
     return false;
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
   };
 
   return (
@@ -245,33 +237,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                     : "OFFLINE"}
                 </span>
               </div>
-
-              {/* User Authentication Status */}
-              {isAuthenticated ? (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400">
-                    <User className="w-3.5 h-3.5" />
-                    <span className="max-w-[120px] truncate font-sans text-xs font-semibold">
-                      {user?.full_name || user?.email}
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    title="Sign Out"
-                    className="p-1.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:text-rose-400 hover:border-rose-500/40 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  to="/auth"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-black font-semibold text-xs font-mono transition-colors shadow-sm"
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>Sign In</span>
-                </Link>
-              )}
             </div>
 
             {/* Mobile Menu Toggle Button */}
@@ -328,30 +293,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               <Users className="w-5 h-5" />
               <span>About Dev</span>
             </button>
-
-            <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
-              {isAuthenticated ? (
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-rose-500 dark:text-rose-400 font-mono text-xs"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Sign Out ({user?.email})</span>
-                </button>
-              ) : (
-                <Link
-                  to="/auth"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-green-600 dark:text-green-400 font-mono text-xs font-semibold"
-                >
-                  <LogIn className="w-4 h-4" />
-                  <span>Sign In / Create Account</span>
-                </Link>
-              )}
-            </div>
           </div>
         )}
       </header>
